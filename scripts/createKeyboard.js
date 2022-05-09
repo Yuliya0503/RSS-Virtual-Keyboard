@@ -32,4 +32,13 @@ class Keyboard {
       ['ControlLeft', 'Lang', 'AltLeft', 'Space', 'AltRight', 'ArrowLeft', 'ArrowDown', 'ArrowRight', 'ControlRight'],
     ];
   }
+  init() {
+    const title = createElement('h1', 'title', null, null, 'Virtual keyboard');
+    const keyboard = this.createKeyboard();
+    const pOS = createElement('p', 'description', null, null, 'Keyboard for Windows operating system');
+    const languageDescription = createElement('p', 'language', null, null, 'Switch language on click: left ctrl + alt');
+    this.textarea = createElement('textarea', 'textarea');
+    document.body.prepend(title, languageDescription, pOS, this.textarea, keyboard);
+    this.textarea.focus();
+  }
 }
