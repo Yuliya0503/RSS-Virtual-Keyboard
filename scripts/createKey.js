@@ -1,7 +1,5 @@
 import languages from "./languages.js";
 
-import languages from './lang/languages.js';
-
 const fucctionalKey = ['AltLeft', 'AltRight', 'ArrowUp', 'ArrowLeft', 'ArrowDown', 'ArrowRight', 'Backspace', 'CapsLock', 'ControlLeft', 'ControlRight', 'Delete', 'Enter', 'ShiftLeft', 'ShiftRight', 'Tab', 'Lang', 'Space'];
 
 function createElement(tag, className, dataName, data, textContent) {
