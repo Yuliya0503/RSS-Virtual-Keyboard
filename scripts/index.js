@@ -32,6 +32,9 @@ class Keyboard {
     this.isShiftPressed = false;
     this.isControlLeftPressed = false;
     this.isAltLeftPressed = false;
+    this.isfucctionalKey = ['AltLeft', 'AltRight', 'ArrowUp', 'ArrowLeft', 
+    'ArrowDown', 'ArrowRight', 'Backspace', 'CapsLock', 'ControlLeft', 'ControlRight', 
+    'Delete', 'Enter', 'ShiftLeft', 'ShiftRight', 'Tab', 'Lang', 'Space'];
   }
   
   init() {
@@ -68,14 +71,41 @@ class Keyboard {
   handleEvents = (event) => {
     event.preventDefault();
     let key;
-    if ((!event.code && !event.target.classList.contains('key')) || event.repeat) return;
+    if ((!event.code && !event.target.classList.contains('key')) 
+      || event.repeat) return;
     try {
       key = (event.classList.contains('key'))?event.target:this.keyboardKeysArr.find((element)=> element.code == element.code).keyHTML;
     }
     catch(error) {return};
     key.addEventListener('mouseup', this.handleEvents);
     key.addEventListener('mouseleave', this.handleEvents);
+   const keyCode = key.dataset.code;
    
+   const restoreKeyboard = () => {
+     const capsKey = ((!this.isShiftPressed && this.isCaps)
+     || (this.isShiftPressed && !this.isCaps)) ? 'shift' : 'min';
+
+     const noCaps = (this.isShiftPressed) ? 'shift' : 'min';
+
+    this.keyboardKeysArr.forEach((keyArr)=> {
+      if(keyArr.isfucctionalKey) return; 
+      const i = keyArr;
+      key.keyHTML.textContent = languages[this.nowlang]
+      .find((element)=> element.code === keyArr.code)[(languages[this.nowlang][0].noCaps.includes(i.code)) 
+      ? noCaps : capsKey];
+    });
+   };
+   const shiftCapsKey = (keyname) => {
+     const code = (keyname === 'CapsLock') ? 'isCaps' : 'isShiftPressed';
+     this[code] = (!this[code]);
+     if(event.type =='keydown' && code == 'isShiftPressed') {
+       this[code] = true;
+     }
+     if(event.type =='keyup' && code == 'isShiftPressed') {
+      this[code] = false;
+    }
+    restoreKeyboard();
+   };
     
   }
 }
