@@ -106,6 +106,15 @@ class Keyboard {
     }
     restoreKeyboard();
    };
+
+   const changehLang = () => {
+     const langName = this.langList.indexOf(this.nowlang);
+     this.nowlang = this.langList[(langName == this.langList.length-1)?0:langCode+1];
+     this.keyboardKeysArr.find(element => element.code === 'Lang').keyHTML.textContent = this.nowlang;
+     localStorage.setItem('keyboardLang', this.currentlang);
+     this.keyboardKeysArr.find((el)=> el.code=='Lang').keyHTML.textContent = this.nowlang;
+     restoreKeyboard();
+   };
     
   }
 }
