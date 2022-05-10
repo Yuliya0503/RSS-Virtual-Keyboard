@@ -107,6 +107,24 @@ class Keyboard {
     restoreKeyboard();
    };
 
+   const deactKey = () => {
+     if((!this.isCaps && keyCode === 'CapsLock') 
+     || (!(['CapsLock', 'ShiftLeft', 'ShiftRight'].includes(keyCode))) 
+     || (['ShiftLeft', 'ShiftRight'].includes(keyCode) &&(event.type == 'keyup' || !this.isShiftPressed))) {
+       key.classList.remove('active');
+     }
+     if(['ControlLeft', 'AltLeft'].includes(keyCode)) {
+       this[is + keyCode + Pressed] = false;
+     }
+     if ((['ShiftLeft', 'ShiftRight'].includes(keyCode))
+         && (!['mouseleave', 'mouseup'].includes(keyCode))){
+          shiftCapsKey();
+     }
+     this.textarea.focus();
+     key.removeEventListener('mouseup', this.handleEvents);
+     key.removeEventListener('mouseleave', this.handleEvents);
+   };
+
    const changehLang = () => {
      const langName = this.langList.indexOf(this.nowlang);
      this.nowlang = this.langList[(langName == this.langList.length-1)?0:langCode+1];
