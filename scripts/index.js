@@ -1,6 +1,5 @@
 import Key from './createKey.js';
 import languages from './languages.js';
-
 function createElement(tag, className, dataName, data, textContent) {
   const element = document.createElement(tag);
   if (className) element.classList.add(className);
@@ -27,14 +26,12 @@ class Keyboard {
     };
     this.langList = Object.keys(languages);
     this.nowlang = langCode;
-    this.keyboardKeysArr = [];
+    this.keyboardKeysObj = [];
     this.isCaps = false;
     this.isShiftPressed = false;
     this.isControlLeftPressed = false;
     this.isAltLeftPressed = false;
-    this.isfucctionalKey = ['AltLeft', 'AltRight', 'ArrowUp', 'ArrowLeft', 
-    'ArrowDown', 'ArrowRight', 'Backspace', 'CapsLock', 'ControlLeft', 'ControlRight', 
-    'Delete', 'Enter', 'ShiftLeft', 'ShiftRight', 'Tab', 'Lang', 'Space'];
+    
   }
   
   init() {
@@ -54,10 +51,10 @@ class Keyboard {
     const keyboard = createElement('div', 'keyboard');
     this.keysMap.forEach((rowKeys) => {
       const row = createElement('div', 'row');
-      rowKeys.forEach((keys) => {
-        const newKey = new Key(this.nowlang, keys);
-        this.keyboardKeysArr.push(newKey);
-        if (keys === 'Lang') {
+      rowKeys.forEach((key) => {
+        const newKey = new Key(this.nowlang, key);
+        this.keyboardKeysObj.push(newKey);
+        if (key === 'Lang') {
           newKey.min = this.nowlang;
           newKey.shift = this.nowlang;
         }
@@ -68,74 +65,133 @@ class Keyboard {
     return keyboard;
   }
 
-  handleEvents = (event) => {
-    event.preventDefault();
+  handleEvents = (e) => {
+    e.preventDefault();
+    if ((!e.target.classList.contains('key') && !e.code) || e.repeat) return;
     let key;
-    if ((!event.code && !event.target.classList.contains('key')) 
-      || event.repeat) return;
     try {
-      key = (event.classList.contains('key'))?event.target:this.keyboardKeysArr.find((element)=> element.code == element.code).keyHTML;
+      key = (e.target.classList.contains('key')) ? e.target : this.keyboardKeysObj.find((el) => el.code === e.code).keyHTML;
+    } catch (err) {
+      return;
     }
-    catch(error) {return};
-    key.addEventListener('mouseup', this.handleEvents);
+
+    const keyCode = key.dataset.code;
+
     key.addEventListener('mouseleave', this.handleEvents);
-   const keyCode = key.dataset.code;
-   
-   const restoreKeyboard = () => {
-     const capsKey = ((!this.isShiftPressed && this.isCaps)
-     || (this.isShiftPressed && !this.isCaps)) ? 'shift' : 'min';
+    key.addEventListener('mouseup', this.handleEvents);
 
-     const noCaps = (this.isShiftPressed) ? 'shift' : 'min';
+    const rebuildKeyboard = () => {//+
+      const noCapsKeys = (this.isShiftPressed) ? 'shift' : 'min';
+      const capsKeys = ((this.isCaps && !this.isShiftPressed) || (!this.isCaps && this.isShiftPressed)) ? 'shift' : 'min';
 
-    this.keyboardKeysArr.forEach((keyArr)=> {
-      if(keyArr.isfucctionalKey) return; 
-      const i = keyArr;
-      key.keyHTML.textContent = languages[this.nowlang]
-      .find((element)=> element.code === keyArr.code)[(languages[this.nowlang][0].noCaps.includes(i.code)) 
-      ? noCaps : capsKey];
-    });
-   };
-   const shiftCapsKey = (keyname) => {
-     const code = (keyname === 'CapsLock') ? 'isCaps' : 'isShiftPressed';
-     this[code] = (!this[code]);
-     if(event.type =='keydown' && code == 'isShiftPressed') {
-       this[code] = true;
-     }
-     if(event.type =='keyup' && code == 'isShiftPressed') {
-      this[code] = false;
+      this.keyboardKeysObj.forEach((keyObj) => {
+        if (keyObj.isfucctionalKey) return;
+        const k = keyObj;
+        k.keyHTML.textContent = languages[this.nowlang]
+          .find((el) => el.code === keyObj.code)[(languages[this.nowlang][0]
+            .noCapsKeys
+            .includes(k.code)) ? noCapsKeys : capsKeys];
+      });
+    };
+
+    const shiftCapsKeyboard = (keycode) => {//+
+      const code = (keycode === 'CapsLock') ? 'isCaps' : 'isShiftPressed';
+      this[code] = (!this[code]);
+      if (code === 'isShiftPressed' && e.type === 'keydown') {
+        this[code] = true;
+      } else if (code === 'isShiftPressed' && e.type === 'keyup') {
+        this[code] = false;
+      }
+      rebuildKeyboard();
+    };
+
+    const switchLang = () => {//+
+      const langIndex = this.langList.indexOf(this.nowlang);
+      this.nowlang = this.langList[(langIndex === this.langList.length - 1)
+        ? 0 : langIndex + 1];
+      localStorage.setItem('keyboardLang', this.nowlang);
+      this.keyboardKeysObj.find((el) => el.code === 'Lang').keyHTML.textContent = this.nowlang;
+      rebuildKeyboard();
+    };
+
+    const deactivateKey = () => {//+
+      if (!(['ShiftLeft', 'ShiftRight', 'CapsLock'].includes(keyCode)) || (keyCode === 'CapsLock' && !this.isCaps)
+          || (['ShiftLeft', 'ShiftRight'].includes(keyCode) && (!this.isShiftPressed || e.type === 'keyup'))) key.classList.remove('active');
+
+      if (['ShiftLeft', 'ShiftRight'].includes(keyCode)) {
+        if (!['mouseup', 'mouseleave'].includes(e.type)) shiftCapsKeyboard();
+      }
+      if (['ControlLeft', 'AltLeft'].includes(keyCode)) {
+        this[`is${keyCode}Pressed`] = false;
+      }
+      key.removeEventListener('mouseleave', this.handleEvents);
+      key.removeEventListener('mouseup', this.handleEvents);
+      this.textarea.focus();
+    };
+
+    const insertChar = (char) =>{
+      this.textarea.setRangeText(char, this.textarea.selectionStart, this.textarea.selectionEnd, 'end');
+    };
+
+    const deleteChar = (delKeyCode) => {
+      const cursorPosition = this.textarea.selectionStart;
+      const { selectionStart, selectionEnd } = this.textarea;
+      const output = this.textarea.value;
+      const setCursorPosition = (shift = 0) => {
+        ['Start', 'End'].forEach((el) => {
+          this.textarea[`selection${el}`] = cursorPosition - shift;
+        });
+      };
+
+      if (selectionStart !== selectionEnd) {
+        this.textarea.value = output.slice(0, selectionStart)
+            + output.slice(selectionEnd, output.length);
+        setCursorPosition();
+      } else if (delKeyCode === 'Backspace' && selectionStart !== 0) {
+        this.textarea.value = output.slice(0, selectionStart - 1)
+            + output.slice(selectionEnd, output.length);
+        setCursorPosition(1);
+      } else if (delKeyCode === 'Delete' && selectionEnd !== output.length) {
+        this.textarea.value = output.slice(0, selectionStart)
+            + output.slice(selectionEnd + 1, output.length);
+        setCursorPosition();
+      }
+    };
+
+    if (['mousedown', 'keydown'].includes(e.type)) {
+      key.classList.add('active');
+      this.textarea.focus();
+
+      if (!key.dataset.isfucctionalKey
+          || this.arrowKeys.includes(keyCode)) {
+        insertChar(key.textContent);
+      } else 
+      
+      if (this.specChars[keyCode]) {
+        insertChar(this.specChars[keyCode]);
+      } else 
+      
+      if (['Backspace', 'Delete'].includes(keyCode)) {
+        deleteChar(keyCode);
+      } else 
+      
+      if (['ShiftLeft', 'ShiftRight', 'CapsLock'].includes(keyCode)) {
+        shiftCapsKeyboard(keyCode);
+      } else 
+      
+      if (['ControlLeft', 'AltLeft'].includes(keyCode)) {
+        this[`is${keyCode}Pressed`] = true;
+        if (this.isControlLeftPressed && this.isAltLeftPressed) switchLang();
+      } else
+      
+      if (keyCode === 'Lang') {
+        switchLang();
+      }
+    } else if (['mouseup', 'mouseleave', 'keyup'].includes(e.type)) {
+      deactivateKey();
     }
-    restoreKeyboard();
-   };
-
-   const deactKey = () => {
-     if((!this.isCaps && keyCode === 'CapsLock') 
-     || (!(['CapsLock', 'ShiftLeft', 'ShiftRight'].includes(keyCode))) 
-     || (['ShiftLeft', 'ShiftRight'].includes(keyCode) &&(event.type == 'keyup' || !this.isShiftPressed))) {
-       key.classList.remove('active');
-     }
-     if(['ControlLeft', 'AltLeft'].includes(keyCode)) {
-       this[is + keyCode + Pressed] = false;
-     }
-     if ((['ShiftLeft', 'ShiftRight'].includes(keyCode))
-         && (!['mouseleave', 'mouseup'].includes(keyCode))){
-          shiftCapsKey();
-     }
-     this.textarea.focus();
-     key.removeEventListener('mouseup', this.handleEvents);
-     key.removeEventListener('mouseleave', this.handleEvents);
-   };
-
-   const changehLang = () => {
-     const langName = this.langList.indexOf(this.nowlang);
-     this.nowlang = this.langList[(langName == this.langList.length-1)?0:langCode+1];
-     this.keyboardKeysArr.find(element => element.code === 'Lang').keyHTML.textContent = this.nowlang;
-     localStorage.setItem('keyboardLang', this.currentlang);
-     this.keyboardKeysArr.find((el)=> el.code=='Lang').keyHTML.textContent = this.nowlang;
-     restoreKeyboard();
-   };
-    
-  }
-}
+  };
+};
 const langCode = localStorage.getItem('keyboardLang') || 'en';
 const keyboard = new Keyboard(langCode);
 keyboard.init();

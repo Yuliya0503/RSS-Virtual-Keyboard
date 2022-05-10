@@ -1,6 +1,7 @@
 import languages from "./languages.js";
 
-const fucctionalKey = ['AltLeft', 'AltRight', 'ArrowUp', 'ArrowLeft', 'ArrowDown', 'ArrowRight', 'Backspace', 'CapsLock', 'ControlLeft', 'ControlRight', 'Delete', 'Enter', 'ShiftLeft', 'ShiftRight', 'Tab', 'Lang', 'Space'];
+const fucctionalKey = ['AltLeft', 'AltRight', 'ArrowUp', 'ArrowLeft', 'ArrowDown', 'ArrowRight', 
+'Backspace', 'CapsLock', 'ControlLeft', 'ControlRight', 'Delete', 'Enter', 'ShiftLeft', 'ShiftRight', 'Tab', 'Lang', 'Space'];
 
 function createElement(tag, className, dataName, data, textContent) {
   const element = document.createElement(tag);
@@ -13,7 +14,7 @@ function createElement(tag, className, dataName, data, textContent) {
 class Key {
   constructor(langCode, code) {
     function findKeyObj() {
-      return languages[langCode].find((element) => element.code === code);
+      return languages[langCode].find(element => element.code === code);
     }
 
     this.min = findKeyObj().min;
