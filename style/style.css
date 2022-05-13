@@ -1,0 +1,110 @@
+* {
+  padding: 0;
+  margin: 0;
+}
+
+html {
+  font-family: 'Fira Sans', sans-serif;
+  font-size: 18px;
+  font-weight: normal;
+  font-style: normal;
+  width: 100%;
+  background-color: #8FBC8F;
+}
+
+.hidden {
+  display: none;
+}
+
+.textarea {
+  width: 75%;
+  border: #013220 solid 5px;
+  border-radius: 40px;
+  margin: 10px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  background-color: #F0FFF0;
+  font-family: 'Fira Sans', sans-serif;
+  font-size: 20px;
+  padding-left: 20px;
+  padding-top: 10px;
+  height: 200px;
+}
+
+.title {
+  font-size: 25px;
+  color: #1c232e;
+}
+
+.caseDown, .caseUp, .shiftCaps, .caps {
+  display: block;
+  min-height: 40px;
+}
+
+.pOS, .language, .title {
+  margin: 10px auto;
+  text-align: center;
+}
+.keyboard {
+  max-width: 1020px;
+  border: #013220 5px solid;
+  border-radius: 10px;
+  display: flex;
+  row-gap: 5px;
+  margin-left: auto;
+  margin-right: auto;
+  flex-wrap: wrap;
+}
+
+.row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.key {
+  width: 60px;
+  height: 60px;
+  background-color: #F0FFF0;
+  border-radius: 60px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  margin: 4px;
+  cursor: pointer;
+  transition: 0.5s;
+}
+
+.key:hover {
+  background-color: #c3e5c3;
+}
+
+.key.active {
+  background-color: #286428;
+}
+
+.Backspace {
+  width: 125px;
+}
+
+.CapsLock {
+  width: 125px;
+}
+
+.Enter {
+  width: 125px;
+}
+
+.ShiftLeft {
+  width: 125px;
+}
+
+.ShiftRight {
+  width: 125px;
+}
+
+.Space {
+  width: 460px;
+}
