@@ -1,2 +1,2 @@
 # RSS-Virtual-Keyboard
-https://github.com/Yuliya0503/RSS-Virtual-Keyboard/pull/1
+https://yuliya0503.github.io/RSS-Virtual-Keyboard/
